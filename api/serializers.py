@@ -25,7 +25,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     # way to obtain a nested serializer
     # product = ProductSerializer() 
 
-    # Way to obtain an specific fields and avoid nested serializers in the response
+    # Way to obtain an specific fields and avoid get all the nested serializers in the response
     product_name = serializers.CharField(source='product.name')
     product_price = serializers.DecimalField(
         max_digits=10,
