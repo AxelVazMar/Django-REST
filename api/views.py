@@ -28,7 +28,7 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
 class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    lookup_field = 'id' # We can use lookup_field to search some object in the url argument e.g: /products/id/ or /products/name/
+    lookup_field = 'id' # We can use lookup_field to search some object in the url as argument e.g: /products/{id}/ or /products/{name}/
 
     def get_permissions(self):
         self.permission_classes = [AllowAny]
@@ -62,7 +62,7 @@ class ProductInfoAPIView(APIView):
         return Response(serializer.data)
 
 
-# API VIEWS
+# API VIEWS With decorators
 
 # Commented this lines cause' I'm doing the same logic above but with APIView
 # @api_view(['GET'])
