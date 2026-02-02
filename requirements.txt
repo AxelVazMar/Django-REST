@@ -10,6 +10,7 @@ drf-spectacular==0.29.0
 gprof2dot==2025.4.14
 inflection==0.5.1
 iniconfig==2.3.0
+isort==7.0.0
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
 packaging==25.0
