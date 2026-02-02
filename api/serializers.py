@@ -43,6 +43,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         )
 
 class OrderSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(read_only = True) # Making this read only so if we need to create an order, the id would be generated auto
     items = OrderItemSerializer(many=True, read_only = True)
     total_price = serializers.SerializerMethodField(method_name='total') # we can use the method_name to call the method with a ShortName
 
