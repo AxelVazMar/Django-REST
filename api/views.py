@@ -15,11 +15,12 @@ from rest_framework.views import APIView
 from api.filters import ProductFilter, InStockFilterBackend
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 
 # Generics views
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.order_by('pk')
     serializer_class = ProductSerializer
     filterset_class = ProductFilter
     filter_backends = [
@@ -30,6 +31,12 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
     ]
     search_fields = ['=name', 'description'] # if we add an '=' in the beginning of the field, that means you need the exact match of the field
     orderig_fields = ['name', 'price', 'stock']
+    # Personalizating the pagination
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 2
+    pagination_class.page_query_param = 'page-num'
+    pagination_class.page_size_query_param = 'size'
+    pagination_class.max_page_size = 8
 
     def get_permissions(self):
         self.permission_classes = [AllowAny]
