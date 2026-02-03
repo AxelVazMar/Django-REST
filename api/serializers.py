@@ -71,6 +71,10 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             'status',
             'items',
         )
+        # Setting the user automatically
+        extra_kwargs = {
+            'user': {'read_only': True}
+        }
 
 class OrderSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only = True) # Making this read only so if we need to create an order, the id would be generated auto
