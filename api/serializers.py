@@ -31,7 +31,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         max_digits=10,
         decimal_places=2,
         source='product.price',
-        )
+    )
 
     class Meta:
         model = OrderItem
@@ -42,9 +42,39 @@ class OrderItemSerializer(serializers.ModelSerializer):
             'item_subtotal',
         )
 
+class OrderCreateSerializer(serializers.ModelSerializer):
+    class OrderItemCreateSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = OrderItem
+            fields = (
+                'product',
+                'quantity'
+            )
+
+    id = serializers.UUIDField(read_only = True)
+    items = OrderItemCreateSerializer(many=True)
+
+    def create(self, validated_data):
+        orderitem_data = validated_data.pop('items')
+        order = Order.objects.create(**validated_data)
+
+        for item in orderitem_data:
+            OrderItem.objects.create(order=order, **item)
+        
+        return order
+
+    class Meta:
+        model = Order
+        fields = (
+            'id',
+            'user',
+            'status',
+            'items',
+        )
+
 class OrderSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only = True) # Making this read only so if we need to create an order, the id would be generated auto
-    items = OrderItemSerializer(many=True, read_only = True)
+    items = OrderItemSerializer(many=True, read_only=True)
     total_price = serializers.SerializerMethodField(method_name='total') # we can use the method_name to call the method with a ShortName
 
     def total(self, obj):

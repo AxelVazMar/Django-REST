@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from api.filters import InStockFilterBackend, OrderFilter, ProductFilter
 from api.models import Order, OrderItem, Product
 from api.serializers import (OrderItemSerializer, OrderSerializer,
-                             ProductInfoSerializer, ProductSerializer)
+                             ProductInfoSerializer, ProductSerializer, OrderCreateSerializer)
 
 # Generics views
 
@@ -61,6 +61,11 @@ class OrderViewset(viewsets.ModelViewSet):
     pagination_class = None
     filterset_class = OrderFilter
     filter_backends = [DjangoFilterBackend]
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return OrderCreateSerializer
+        return super().get_serializer_class()
 
     # If the user is not staff, only can view their own orders
     def get_queryset(self):
