@@ -62,28 +62,12 @@ class OrderViewset(viewsets.ModelViewSet):
     filterset_class = OrderFilter
     filter_backends = [DjangoFilterBackend]
 
-    @action(
-            detail=False, 
-            methods=['get'], 
-            url_path='user-orders',
-        )
-    def user_orders(self, request):
-        orders = self.get_queryset().filter(user=request.user)
-        serializer = self.get_serializer(orders, many=True)
-        return Response(serializer.data)
-
-# class OrderListAPIView(generics.ListAPIView):
-#     queryset = Order.objects.prefetch_related('items__product')
-#     serializer_class = OrderSerializer
-
-# class UserOrderListAPIView(generics.ListAPIView):
-#     queryset = Order.objects.prefetch_related('items__product')
-#     permission_classes = [IsAuthenticated]
-#     serializer_class = OrderSerializer
-    
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-#         return qs.filter(user=self.request.user)
+    # If the user is not staff, only can view their own orders
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if not self.request.user.is_staff:
+            qs = qs.filter(user=self.request.user)
+        return qs
 
 # APIViews Classes
 
@@ -96,17 +80,3 @@ class ProductInfoAPIView(APIView):
             'max_price': products.aggregate(max_price=Max('price'))['max_price']
         })
         return Response(serializer.data)
-
-
-# API VIEWS With decorators
-
-# Commented this lines cause' I'm doing the same logic above but with APIView
-# @api_view(['GET'])
-# def product_info(request):
-#     products = Product.objects.all()
-#     serializer = ProductInfoSerializer({
-#         'products': products,
-#         'count': len(products),
-#         'max_price': products.aggregate(max_price=Max('price'))['max_price']
-#     })
-#     return Response(serializer.data)
