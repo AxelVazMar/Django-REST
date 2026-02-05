@@ -67,7 +67,7 @@ class OrderViewset(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_serializer_class(self):
-        if self.action == 'create':
+        if self.action == 'create' or self.request.method == 'PUT':
             return OrderCreateSerializer
         return super().get_serializer_class()
 
