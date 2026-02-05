@@ -11,9 +11,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.filters import InStockFilterBackend, OrderFilter, ProductFilter
-from api.models import Order, OrderItem, Product
+from api.models import Order, OrderItem, Product, User
 from api.serializers import (OrderItemSerializer, OrderSerializer,
-                             ProductInfoSerializer, ProductSerializer, OrderCreateSerializer)
+                             ProductInfoSerializer, ProductSerializer, OrderCreateSerializer,
+                             UserSerializer)
 
 # Generics views
 
@@ -89,3 +90,13 @@ class ProductInfoAPIView(APIView):
             'max_price': products.aggregate(max_price=Max('price'))['max_price']
         })
         return Response(serializer.data)
+    
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.prefetch_related(
+        'orders',
+        'orders__items',
+        'orders__items__product',
+        'user_permissions'
+    )
+    serializer_class = UserSerializer
+    pagination_class = None

@@ -1,6 +1,7 @@
 from django.db import transaction
-from .models import Product, Order, OrderItem
+from .models import Product, Order, OrderItem, User
 from rest_framework import serializers
+
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -122,3 +123,46 @@ class ProductInfoSerializer(serializers.Serializer):
     products = ProductSerializer(many=True)
     count = serializers.IntegerField()
     max_price = serializers.FloatField()
+
+class UserItemSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='product.name')
+
+    class Meta:
+        model = OrderItem
+        fields = (
+            'product_name',
+        )
+
+class UserOrderSerializer(serializers.ModelSerializer):
+    items = UserItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Order
+        fields = (
+            'id',
+            'items',
+        )
+
+class UserSerializer(serializers.ModelSerializer):
+    orders = UserOrderSerializer(many=True, read_only=True)
+    total_orders = serializers.SerializerMethodField(method_name='get_total_orders')
+
+    def get_total_orders(self, obj):
+        return obj.orders.count()
+
+    class Meta:
+        model = User
+        fields = (
+            'username', 
+            'user_permissions', 
+            'is_authenticated', 
+            'get_full_name', 
+            'orders',
+            'total_orders'
+        )
+        # fields = (
+        #     'username',
+        #     'email',
+        #     'is_staff',
+        #     'is_superuser'
+        # )
