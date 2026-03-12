@@ -39,7 +39,7 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
     pagination_class.page_size_query_param = 'size'
     pagination_class.max_page_size = 8
 
-    @method_decorator(cache_page(60 * 15, key_prefix="product_list"))
+    #@method_decorator(cache_page(60 * 15, key_prefix="product_list"))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
     
