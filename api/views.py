@@ -11,6 +11,7 @@ from rest_framework.pagination import (LimitOffsetPagination,
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.throttling import ScopedRateThrottle
 
 from api.filters import InStockFilterBackend, OrderFilter, ProductFilter
 from api.models import Order, OrderItem, Product, User
@@ -21,6 +22,8 @@ from api.serializers import (OrderItemSerializer, OrderSerializer,
 # Generics views
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
+    throttle_scope = 'products'
+    throttle_classes = [ScopedRateThrottle]
     queryset = Product.objects.order_by('pk')
     serializer_class = ProductSerializer
     filterset_class = ProductFilter
@@ -39,13 +42,13 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
     pagination_class.page_size_query_param = 'size'
     pagination_class.max_page_size = 8
 
-    #@method_decorator(cache_page(60 * 15, key_prefix="product_list"))
+    @method_decorator(cache_page(60 * 15, key_prefix="product_list"))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
     
     def get_queryset(self):
-        import time
-        time.sleep(2)
+        # import time
+        # time.sleep(2)
         return super().get_queryset()
     
     def get_permissions(self):
@@ -67,6 +70,7 @@ class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     
 
 class OrderViewset(viewsets.ModelViewSet):
+    throttle_scope = 'orders'
     queryset = Order.objects.prefetch_related('items__product')
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]

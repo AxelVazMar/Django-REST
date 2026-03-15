@@ -135,7 +135,22 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 5
+    'PAGE_SIZE': 5,
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        # 'api.throttles.BurstRateThrottle',
+        # 'api.throttles.SustaninedRateThrottle',
+        'rest_framework.throttling.ScopedRateThrottle',
+    ],
+    # How many requests a user can make in a given time frame
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '2/minute',
+        # 'burst': '10/minute', # if a user makes more than 10 requests in a minute, they will be throttled for a minute
+        # 'sustained': '15/hour' # if a user makes more than 15 requests in an hour, they will be throttled for an hour
+        'products': '2/minute', # This defines in the serializers the rate of requests for the products endpoint
+        'orders': '4/minute', # This defines in the serializers the rate of requests for the orders endpoint
+    }
+
 }
 
 # Settings for DRF Spectacular (documentation of the API of the project)
@@ -152,6 +167,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKE_LIFETIME': timedelta(days=1)
 }
 
+# In development without Redis, use local memory cache so throttling and other cache usages work.
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
