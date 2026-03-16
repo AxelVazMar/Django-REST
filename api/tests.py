@@ -97,3 +97,35 @@ class ProductAPITestCase(APITestCase):
         self.client.login(username='admin', password='adminpass123')
         response = self.client.post(self.url2, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+class UserRegistrationTestCase(APITestCase):
+    def setUp(self):
+        self.url = reverse('user-register')
+
+    def test_register_user(self):
+        data = {
+            'username': 'newuser',
+            'email': 'newuser@example.com',
+            'password': 'securepassword123'
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_register_user_with_existing_email(self):
+        User.objects.create_user(username='existinguser', email = 'newuser@example.com', password='securepassword123')
+        data = {
+            'username': 'user1',
+            'email': 'newuser@example.com',
+            'password': 'securepassword123'
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.data["email"][0], "There is an account associated with this email")
+
+    def test_validate_password_length(self):
+        data = {
+            'username': 'user2',
+            'email': 'user2@example.com',
+            'password': 'short'
+        }
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.data["password"][0], "Password must be at least 8 characters long")
