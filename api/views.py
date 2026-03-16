@@ -16,7 +16,7 @@ from rest_framework.throttling import ScopedRateThrottle
 from api.filters import InStockFilterBackend, OrderFilter, ProductFilter
 from api.models import Order, OrderItem, Product, User
 from api.serializers import (OrderItemSerializer, OrderSerializer,
-                             ProductInfoSerializer, ProductSerializer, OrderCreateSerializer,
+                             ProductInfoSerializer, ProductSerializer, RegisterUserSerializer, OrderCreateSerializer,
                              UserSerializer)
 from api.tasks import send_order_confirmation_email_task
 
@@ -118,3 +118,8 @@ class UserListView(generics.ListAPIView):
     )
     serializer_class = UserSerializer
     pagination_class = None
+
+class RegisterUserAPIView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = RegisterUserSerializer
+    throttle_classes = [] # We can disable the throttle for this endpoint, because if we have a throttle for users, that means we can only create a limited number of users in a period of time, and that is not good for a registration endpoint.

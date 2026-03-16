@@ -160,9 +160,29 @@ class UserSerializer(serializers.ModelSerializer):
             'orders',
             'total_orders'
         )
-        # fields = (
-        #     'username',
-        #     'email',
-        #     'is_staff',
-        #     'is_superuser'
-        # )
+    
+class RegisterUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'email',
+            'password',
+        )
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
+    
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("There is an account associated with this email")
+        return value
+    
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Password must be at least 8 characters long")
+        return value

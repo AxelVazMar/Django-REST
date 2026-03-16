@@ -7,6 +7,7 @@ urlpatterns = [
     path('products/info/', views.ProductInfoAPIView.as_view()),
     path('products/<int:id>/', views.ProductDetailAPIView.as_view(), name='product-detail'),
     path('users/', views.UserListView.as_view()),
+    path('users/register/', views.RegisterUserAPIView.as_view()),
 ]
 
 router = DefaultRouter()
