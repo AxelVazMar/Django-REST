@@ -18,6 +18,7 @@ from api.models import Order, OrderItem, Product, User
 from api.serializers import (OrderItemSerializer, OrderSerializer,
                              ProductInfoSerializer, ProductSerializer, OrderCreateSerializer,
                              UserSerializer)
+from api.tasks import send_order_confirmation_email_task
 
 # Generics views
 
@@ -80,7 +81,9 @@ class OrderViewset(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         # Saving the user to set it auto in the serializer
-        serializer.save(user=self.request.user)
+        order = serializer.save(user=self.request.user)
+        # delay is like say to celery "Execute this task when you have time"
+        send_order_confirmation_email_task.delay(order.id, self.request.user.email)
 
     def get_serializer_class(self):
         if self.action == 'create' or self.request.method == 'PUT':

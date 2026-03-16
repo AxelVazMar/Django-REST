@@ -177,3 +177,11 @@ CACHES = {
         }
     }
 }
+
+# Tell celery to use Redis as the broker - same url as CACHES setting
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/1"
+
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/1"
+
+# For development, we can use the console email backend to see the emails in the console instead of sending them.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
