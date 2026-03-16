@@ -38,6 +38,7 @@ class ProductAPITestCase(APITestCase):
             stock = 10
         )
         self.url = reverse('product-detail', kwargs={'id': self.product.pk})
+        self.url2 = reverse('product-list')
 
     def test_get_product(self):
         response = self.client.get(self.url)
@@ -79,3 +80,20 @@ class ProductAPITestCase(APITestCase):
         response = self.client.patch(self.url, data)
         print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_only_admins_can_create_product(self):
+        # test normal user cannot create
+        self.client.login(username='user', password='userpass123')
+        data = {
+            'name': 'New Product',
+            'description': 'Description of new product',
+            'price': 29.99,
+            'stock': 15
+        }
+        response = self.client.post(self.url2, data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # test admin user can create
+        self.client.login(username='admin', password='adminpass123')
+        response = self.client.post(self.url2, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
